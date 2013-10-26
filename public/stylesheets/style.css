@@ -46,6 +46,16 @@ a {
 	margin-bottom: 0px !important;
 }
 
+.confirmButton {
+	background-color: #0000FF !important;
+	border-color: #0005FF !important;
+}
+
+.cancelButton {
+	background-color: #FF0000 !important;
+	border-color: #FF0505 !important;
+}
+
 .chatbox {
 	position: absolute;
 	top: 10px;

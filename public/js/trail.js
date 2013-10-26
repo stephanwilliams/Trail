@@ -16,6 +16,7 @@ function refreshRoomsList(snapshot) {
             buttonType = 'Even';
         }
         $('.roomlist').append('<a href="#" class="roomButton' + buttonType + ' button" roomId=' + roomId + '>' + roomName + '</a>');
+        index++;
     });
 }
 
