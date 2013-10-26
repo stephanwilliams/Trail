@@ -2,6 +2,7 @@ var trail = new Firebase('https://trail.firebaseio.com/');
 var roomIds = trail.child('room_ids');
 var rooms = trail.child('rooms');
 var currentRoom;
+var currentPost;
 var currentRoomValueCache;
 
 roomIds.on('value', refreshRoomsList);
@@ -118,3 +119,61 @@ function createNewPost(roomId, userId, content, parents, callback) {
     });
     if (typeof callback === 'function') callback(newPost);
 }
+
+function addNewHistoryPost(postId) {
+    var history = null;
+    if (localStorage.getItem('history') === null) {
+        history = {};
+    } else {
+        history = JSON.parse(localStorage.getItem('history'));
+    }
+    history[currentRoom.name()].push(postId);
+    localStorage.setItem('history', JSON.stringify(history));
+}
+
+function addNewPinnedPost(postId) {
+    var pinned = null;
+    if (localStorage.getItem('pinned') === null) {
+        pinned = {};
+    } else {
+        pinned = JSON.parse(localStorage.getItem('pinned'));
+    }
+    pinned[currentRoom.name()].push(postId);
+    localStorage.setItem('pinned', JSON.stringify(pinned));
+}
+
+
+function getPost(roomId, postId, callback) {
+    if (currentRoom.name() === roomId) {
+        var post = {};
+        post[postId] = currentRoomValueCache['posts'][postId];
+        if (typeof callback === 'function')
+            callback(post);
+    } else {
+        rooms.child(roomId)
+            .child('posts')
+            .child(postId).once('value', function(snapshot) {
+                var post = {};
+                post[postId] = snapshot.val();
+                if (typeof callback === 'function') callback(post);
+            });
+    }
+}
+
+function getFirstPost(roomId, callback) {
+    if (currentRoom.name() === roomId) {
+        var posts = currentRoomValueCache['posts'];
+        for (var key in posts) if (posts.hasOwnProperty(key)) break;
+        var post = {}
+        post[key] = posts[key];
+        if (typeof callback === 'function') callback(post);
+    } else {
+        rooms.child(roomId)
+             .child('posts')
+             .startAt()
+             .limit(1).once('value', function(snapshot) {
+                 if (typeof callback === 'function') callback(snapshot.val());
+             });
+    }
+}
+
