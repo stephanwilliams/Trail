@@ -13,11 +13,28 @@ body{
 }
 #Title{
 	font-family: "Crimson Text";
-	font-color: white;
+	color:white;
+	font-size: 40px;
+	text-decoration: none;
 	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
+	top: 45%;
+	right: 20%;
 	z-index: 6;
+}
+#Join{
+	position: absolute;
+	top: 50%;
+	right: 30%;
+	z-index:6;
+
+}
+h1{
+	font-family: "Crimson Text";
+	color: white;
+	font-size: 100px;
+	text-decoration: none;
+	position: absolute;
+	top: 40%;
+	left: 10%;
+	z-index: 10;
 }
