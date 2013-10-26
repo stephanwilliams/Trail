@@ -151,36 +151,42 @@ function addNewPinnedPost(postId) {
 }
 
 
+// returns data via callback as [ postId, {post obj} ]
 function getPost(roomId, postId, callback) {
     if (currentRoom.name() === roomId) {
-        var post = {};
-        post[postId] = currentRoomValueCache['posts'][postId];
+        var post = [ postId, currentRoomValueCache['posts'][postId] ];
         if (typeof callback === 'function')
             callback(post);
     } else {
         rooms.child(roomId)
             .child('posts')
             .child(postId).once('value', function(snapshot) {
-                var post = {};
-                post[postId] = snapshot.val();
+                var post = [ postId, snapshot.val() ];;
                 if (typeof callback === 'function') callback(post);
             });
     }
 }
 
+// returns data via callback as [ postId, {post obj} ]
 function getFirstPost(roomId, callback) {
     if (currentRoom.name() === roomId) {
         var posts = currentRoomValueCache['posts'];
         for (var key in posts) if (posts.hasOwnProperty(key)) break;
-        var post = {}
-        post[key] = posts[key];
+        var post = [ key, posts[key] ]; 
         if (typeof callback === 'function') callback(post);
     } else {
         rooms.child(roomId)
              .child('posts')
              .startAt()
              .limit(1).once('value', function(snapshot) {
-                 if (typeof callback === 'function') callback(snapshot.val());
+                 var post = [];
+                 for (key in snapshot.val()) {
+                     if (snapshot.val().hasOwnProperty(key)) {
+                         post = [ key, snapshot.val()[key] ];
+                         break;
+                     }
+                 }
+                 if (typeof callback === 'function') callback(post);
              });
     }
 }
