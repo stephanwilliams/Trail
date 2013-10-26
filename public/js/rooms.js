@@ -9,7 +9,7 @@ $(function() {
 
 	$('#cancelButton').on('click', function() {
 		$('#createRoomModal').foundation('reveal', 'close');
-	})
+	});
 
 	// Hi Jeffrey
-})
+});
