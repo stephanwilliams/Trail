@@ -22,7 +22,12 @@ function refreshRoomsList(snapshot) {
     });
 
     $('[class*=roomButton]').on('click', function() {
-        console.log("Joining " + $(this).html() + "...");
+        var roomId = $(this).attr('roomId');
+        changeCurrentRoom(roomId, function() {
+            getFirstPost(roomId, function(value) {
+                gah = value;
+            });
+        });
     });
 }
 
@@ -34,14 +39,17 @@ $('#ROOM_BUTTON_ID').on('click', function(event) {
 });
 
 // takes the room id as a string
-function changeCurrentRoom(newRoomId) {
+function changeCurrentRoom(newRoomId, callback) {
     if (currentRoom != null) currentRoom.off('value', refreshCurrentRoom);
     currentRoom = trail.child('rooms').child(newRoomId);
-    currentRoom.on('value', refreshCurrentRoom);
+    currentRoom.on('value', refreshCurrentRoom(callback));
 }
 
-function refreshCurrentRoom(snapshot) {
-    currentRoomValueCache = snapshot.val();
+function refreshCurrentRoom(callback) {
+    return function(snapshot) {
+        currentRoomValueCache = snapshot.val();
+        if (typeof callback === 'function') callback();
+    }
 }
 
 /**
