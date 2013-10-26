@@ -10,16 +10,35 @@
 	<link rel="stylesheet" href="/stylesheets/normalize.css">
 	<link rel="stylesheet" href="/stylesheets/style.css">
 	<link rel="stylesheet" href="/stylesheets/foundation.min.css">
+	<link rel="stylesheet" href = "/stylesheets/global.css"/>
+	<link href='//fonts.googleapis.com/css?family=Crimson+Text' rel='stylesheet' type='text/css'>
 
 	<script src="/js/vendor/custom.modernizr.js"></script>    
+	<script src="/js/moment.min.js"></script>
 </head>
 <body>
-	<div class="roomlist" style="border:1px solid #ccc; overflow:auto;">
-		<a id="createRoomButton" href="#" class="createRoomButton button">Create Room</a>
+    <div id="sidebar">
+        <!--<div id="sidebar-tabs">-->
+        <!--    <a id="room-list-tab" class="sidebar-tab button tab-selected">Rooms</a>-->
+            <!--<a id="history-tab" class="sidebar-tab button">History</a>-->
+        <!--</div>-->
+        <div id="room-list" class="sidebar-pane">
+		    <a id="createRoomButton" href="#" class="createRoomButton button">Create Room</a>
+	    </div>
+	    <!--<div id="history" class="sidebar-pane">-->
+	        
+	    </div>
+    </div>
+
+    <div id="center-container">
+        <div id="infovis">
+        </div>
 	</div>
 
-	<div class="chatbox">
+    <!--
+	<div class="chatbox" id="infovis">
 	</div>
+	-->
 
 	<div id="createRoomModal" class="reveal-modal">
 		<form data-abide id='createRoomForm'>
@@ -54,6 +73,37 @@
 		</form>
 	</div>
 
+	<div id="createPostPane">
+		<form data-abide id='createPostForm'>
+			<fieldset>
+				<legend>Add Post</legend>
+				<div class="row" style="margin-bottom: 10px">
+				    <div class="large-12 columns">
+				        <label>Replying to:</label>
+				        <div id="parents"></div>
+				    </div>
+				</div>
+				<div class="row">
+					<div class="large-12 columns">
+						<label>Initial Post <small>*</small></label>
+						<textarea id='postContentText' required pattern='(.)+' rows="8" cols="50" placeholder="Post content" style="resize:none; height: 10%"></textarea>
+						<small class='error'>Post cannot be empty!</small>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="small-3 columns">
+						<button type="submit" id="postButton">Post</a>
+					</div>
+					<div class="large-9 columns">
+						<a id="postCancelButton" href="#" class="cancelButton button">Cancel</a>
+					</div>
+				</div>
+
+			</fieldset>
+		</form>
+	</div>
+
 	<script>
 		document.write('<script src=/js/vendor/'
     	+ ('__proto__' in {} ? 'zepto' : 'jquery')
@@ -61,6 +111,7 @@
 	</script>
 
     <script type='text/javascript' src='https://cdn.firebase.com/v0/firebase.js'></script>
+    <script type='text/javascript' src='/js/jit-yc.js'></script>
     
     <!-- Foundation -->
     <script src='/js/foundation.min.js'></script>
