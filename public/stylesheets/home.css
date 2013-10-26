@@ -1,0 +1,23 @@
+@-webkit-keyframes typing{from{width: 0;}}
+@-webkit-keyframes blink-caret{50%{border-color: transparent;}}
+body{
+	background-color:black;
+}
+.bgimg{
+	height: 100%;
+	display:block;
+	margin-left: auto;
+	margin-right: auto;
+	position: relative;
+	z-index: 1;
+}
+#Title{
+	font-family: "Crimson Text";
+	font-color: white;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 6;
+}
