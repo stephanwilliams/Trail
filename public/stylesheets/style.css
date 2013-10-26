@@ -6,3 +6,40 @@ body {
 a {
   color: #00B7FF;
 }
+
+.roomlist {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 400px;
+	height: 100%;
+}
+
+.roomButtonOdd {
+	background-color: #2ba6cb !important;
+	border-color: #2284a1 !important;
+	width: 398px !important;
+	height: 100px !important;
+	padding-left: 0 !important;
+	padding-right: 0 !important;
+	margin-bottom: 0px !important;
+}
+
+.roomButtonEven {
+	background-color: #6ca7cb !important;
+	border-color: #6384a1 !important;
+	width: 398px !important;
+	height: 100px !important;
+	padding-left: 0 !important;
+	padding-right: 0 !important;
+	margin-bottom: 0px !important;
+}
+
+.chatbox {
+	position: absolute;
+	top: 10px;
+	bottom: 0px;
+	left: 410px;
+	right: 0px;
+}
+
