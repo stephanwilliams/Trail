@@ -14,20 +14,32 @@
 	<script src="/js/vendor/custom.modernizr.js"></script>    
 </head>
 <body>
-
 	<div class="roomlist" style="border:1px solid #ccc; overflow:auto;">
-		<a href="#" class="roomButtonOdd button">Room 1</a>
-		<a href="#" class="roomButtonEven button">Room 2</a>
-		<a href="#" class="roomButtonOdd button">Room 3</a>
-		<a href="#" class="roomButtonEven button">Room 4</a>
-		<a href="#" class="roomButtonOdd button">Room 5</a>
-		<a href="#" class="roomButtonEven button">Room 6</a>
-		<a href="#" class="roomButtonOdd button">Room 7</a>
-		<a href="#" class="roomButtonEven button">SEXTING PLS DON'T ENTER</a>
+		<a id="createRoomButton" href="#" class="createRoomButton button">Create Room</a>
 	</div>
 
 	<div class="chatbox">
-		hello
+	</div>
+
+	<div id="createRoomModal" class="reveal-modal">
+		<form>
+			<fieldset>
+				<legend>Create Room</legend>
+				<div class="row">
+					<div class="large-12 columns">
+						<label>Room Name</label>
+						<input type="text" placeholder="Enter the name of your chatroom">
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="large-12 columns">
+						<label>Initial Post</label>
+						<textarea rows="8" cols="50" placeholder="Enter the text for the initial post for this room" style="resize:none; height: 10%"></textarea>
+					</div>
+				</div>
+			</fieldset>
+		</form>
 	</div>
 
 	<script>
@@ -42,6 +54,7 @@
     <script src='/js/foundation.min.js'></script>
 
     <script type='text/javascript' src='/js/trail.js'></script>
+    <script type='text/javascript' src='/js/rooms.js'></script>
 
 	<script>
 	  $(document).foundation();

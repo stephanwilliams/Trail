@@ -7,8 +7,15 @@ var currentRoomValueCache;
 roomIds.on('value', refreshRoomsList);
 
 function refreshRoomsList(snapshot) {
+    $('.roomlist').children('[class*=roomButton]').remove();
+
+    var index = 0
     $.each(snapshot.val(), function(roomName, roomId) {
-        // add to the room list
+        var buttonType = 'Odd';
+        if (index % 2 == 0) {
+            buttonType = 'Even';
+        }
+        $('.roomlist').append('<a href="#" class="roomButton' + buttonType + ' button" roomId=' + roomId + '>' + roomName + '</a>');
     });
 }
 
@@ -28,7 +35,6 @@ function changeCurrentRoom(newRoomId) {
 
 function refreshCurrentRoom(snapshot) {
     currentRoomValueCache = snapshot.val();
-    // refresh the current room
 }
 
 /**
