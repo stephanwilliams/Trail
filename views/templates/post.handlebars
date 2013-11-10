@@ -1,0 +1,16 @@
+<div class="post" id="{{post_id}}">
+    <div class="post-header">
+        <div class="post-username">
+            {{! TODO: link to profile }}
+            {{user_id}}
+        </div>
+        {{! TODO: automagically fill in time w/ JS, update periodically }}
+        <div class="post-time" data-post-time="{{ts}}"></div>
+        <div class="post-reply"></div>
+        <div class="post-pin"></div>
+        <div class="post-upvote"></div>
+    </div>
+    <div class="post-content">
+        {{content}}
+    </div>
+</div>

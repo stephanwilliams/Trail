@@ -1,9 +1,7 @@
 body {
   padding: 50px;
   font: 18px "Lucida Grande", Helvetica, Arial, sans-serif;
-  
 }
-
 #sidebar {
 	position: fixed;
 	top: 0;
@@ -14,43 +12,26 @@ body {
 	overflow:auto;
 	z-index:100;
 }
-.post-header {
-  width: 300px;
-  height: 150px;
-  line-height: 23px;
-  font-size: 10pt;
-  padding-left: 5px;
-}
-.post-time {
-  padding-left: 15px;
-  color: #ddd;
-}
-.post-reply {
-  right: 0;
-  position: absolute;
-  background-color: #2e2e2e;
-  padding-right: 5px;
-  padding-left: 5px;
-  -webkit-transition: all 0.1s linear;
-  cursor: pointer;
-  color: white;
-}
-.post-reply:hover {
-  -webkit-transition: all 0.1s linear;
-  padding-right: 10px;
-  padding-left: 10px;
-}
-.post-content {
-  padding: 3px 5px 3px 5px;
-  background-color: white;
-  bottom: 0; left: 0; right: 0; top: 23px;
-  position: absolute;
-  cursor: pointer;
-}
 #center-container {
+    background-color: black;
     position:fixed;
     left: 200px;
     right: 0px;
     top:0;
     bottom:0;
+}
+.post-container {
+    background-color:gray;
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 30%;
+    display: inline-block;
+}
+#parents { left: 0%; }
+#current { left: 35%; }
+#children { left: 70%; }
+
+.post {
+    background-color: white;
 }

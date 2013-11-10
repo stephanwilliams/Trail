@@ -1,24 +1,38 @@
 var trail = new Firebase('https://trail.firebaseio.com/');
-var roomIds = trail.child('room_ids');
 var rooms = trail.child('rooms');
 var currentRoom;
+var currentRoomId;
 var currentPost;
 var currentRoomValueCache;
 
-var composingPost = false;
+$(document).ready(function() {
+    currentRoomId = window.location.hash.substring(1);
+    currentRoom = trail.child('rooms').child(currentRoomId);
+    currentRoom.on('value', refreshCurrentRoom(null));
+    currentRoom.once('value', refreshCurrentRoom(function() {
+        console.log("refreshed");
+        getFirstPost(function(post) {
+            console.log("got first post");
+            changeCurrentPost(post, function() {
+                console.log("changed current post");
+            });
+        });
+    }));
+});
 
-function replyAction(event) {
-    if (!composingPost) {
-        composingPost = true;
-        $('#createPostPane').show();
-    }
-    var postId = $(this).parent().parent().attr('id');
-    var userId = $(this).parent().find('.post-user-id').text();
+
+//function replyAction(event) {
+    //if (!composingPost) {
+        //composingPost = true;
+        //$('#createPostPane').show();
+    //}
+    //var postId = $(this).parent().parent().attr('id');
+    //var userId = $(this).parent().find('.post-user-id').text();
     
-    if ($('#parents').find('[data-post-id=' + postId + ']').length == 0) {
-        $('#parents').append('<span data-post-id="' + postId + '">' + userId + '</span>');
-    }
-}
+    //if ($('#parents').find('[data-post-id=' + postId + ']').length == 0) {
+        //$('#parents').append('<span data-post-id="' + postId + '">' + userId + '</span>');
+    //}
+//}
 
 //roomIds.on('value', refreshRoomsList);
 
@@ -234,11 +248,46 @@ function refreshCurrentRoom(callback) {
     }
 }
 
-function changeCurrentPost(roomId, newPostId, callback) {
-    getPost(roomId, newPostId, function(post) {
-        createSpaceTree(post, roomId);
-        if (typeof callback === 'function') callback(post);
+function changeCurrentPostById(newPostId, callback) {
+    getPost(newPostId, function(post) {
+        changeCurrentPost(newPost, callback);
     });
+}
+    
+function changeCurrentPost(newPost, callback) {
+    $('#parents, #current, #children').empty();
+    $('#current').html(generatePostHtml(newPost));
+    if ($.isArray(newPost['parents'])) {
+        $.each(newPost['parents'], function(index, value) {
+            getPost(value, function(post) {
+                $('#parents').append(generatePostHtml(post));
+                $('#'+value).on('click', function() {
+                    changeCurrentPost(post, null);
+                });
+            });
+        });
+    }
+    if ($.isArray(newPost['children'])) {
+        $.each(newPost['children'], function(index, value) {
+            getPost(value, function(post) {
+                $('#children').append(generatePostHtml(post));
+                $('#'+value).on('click', function() {
+                    changeCurrentPost(post, null);
+                });
+            });
+        });
+    }
+    if (typeof callback === 'function') callback(newPost);
+}
+
+function generatePostHtml(rawPost) {
+    var post = {
+        post_id: rawPost['id'],
+        user_id: rawPost['user_id'],
+        ts: rawPost['ts'],
+        content: rawPost['content']
+    };
+    return Handlebars.templates.post(post);
 }
 
 /**
@@ -248,39 +297,39 @@ function changeCurrentPost(roomId, newPostId, callback) {
  * transaction was successful, or an error string if posting
  * failed.
  */
-function createNewRoom(roomName, userId, content, callback) {
-    var newRoom = rooms.push();
-    roomIds.transaction(function(currentRooms) {
-        if (!$.isPlainObject(currentRooms)) {
-            currentRooms = {};
-        }
-        if (roomName in currentRooms) {
-            callback('A room with that name already exists!');
-            return;
-        }
-        currentRooms[roomName] = newRoom.name();
-        return currentRooms;
-    }, function (error, committed, snapshot) {
-        if (error !== null || !committed) {
-            if (typeof callback === 'function')
-                callback('Room creation failed!' +
-                    '<br />Was there an error? ' + error +
-                    '<br />Were the changes committed? ' + committed);
-            return;
-        } else {
-            changeCurrentRoom(newRoom.name());
-            createNewPost(newRoom.name(), userId, content, null,
-                function(value) {
-                    if (typeof value === 'string') { // there was an error
-                        if (typeof callback === 'function')
-                            callback('Failed creating initial post!<br />' + value);
-                        return;
-                    }
-                });
-        }
-    });
-    if (typeof callback === 'function') callback(newRoom);
-}
+//function createNewRoom(roomName, userId, content, callback) {
+    //var newRoom = rooms.push();
+    //roomIds.transaction(function(currentRooms) {
+        //if (!$.isPlainObject(currentRooms)) {
+            //currentRooms = {};
+        //}
+        //if (roomName in currentRooms) {
+            //callback('A room with that name already exists!');
+            //return;
+        //}
+        //currentRooms[roomName] = newRoom.name();
+        //return currentRooms;
+    //}, function (error, committed, snapshot) {
+        //if (error !== null || !committed) {
+            //if (typeof callback === 'function')
+                //callback('Room creation failed!' +
+                    //'<br />Was there an error? ' + error +
+                    //'<br />Were the changes committed? ' + committed);
+            //return;
+        //} else {
+            //changeCurrentRoom(newRoom.name());
+            //createNewPost(newRoom.name(), userId, content, null,
+                //function(value) {
+                    //if (typeof value === 'string') { // there was an error
+                        //if (typeof callback === 'function')
+                            //callback('Failed creating initial post!<br />' + value);
+                        //return;
+                    //}
+                //});
+        //}
+    //});
+    //if (typeof callback === 'function') callback(newRoom);
+//}
 
 /**
  * Adds a post to Firebase.
@@ -317,68 +366,81 @@ function createNewPost(roomId, userId, content, parents, callback) {
     if (typeof callback === 'function') callback(newPost);
 }
 
-function addNewHistoryPost(postId) {
-    var history = null;
-    if (localStorage.getItem('history') === null) {
-        history = {};
-    } else {
-        history = JSON.parse(localStorage.getItem('history'));
-    }
-    history[currentRoom.name()].push(postId);
-    localStorage.setItem('history', JSON.stringify(history));
+//function addNewHistoryPost(postId) {
+    //var history = null;
+    //if (localStorage.getItem('history') === null) {
+        //history = {};
+    //} else {
+        //history = JSON.parse(localStorage.getItem('history'));
+    //}
+    //history[currentRoom.name()].push(postId);
+    //localStorage.setItem('history', JSON.stringify(history));
+//}
+
+//function addNewPinnedPost(postId) {
+    //var pinned = null;
+    //if (localStorage.getItem('pinned') === null) {
+        //pinned = {};
+    //} else {
+        //pinned = JSON.parse(localStorage.getItem('pinned'));
+    //}
+    //pinned[currentRoom.name()].push(postId);
+    //localStorage.setItem('pinned', JSON.stringify(pinned));
+//}
+
+function getPost(postId, callback) {
+    var post = currentRoomValueCache['posts'][postId];
+    post['id'] = postId;
+    if (typeof callback === 'function') callback(post);
 }
 
-function addNewPinnedPost(postId) {
-    var pinned = null;
-    if (localStorage.getItem('pinned') === null) {
-        pinned = {};
-    } else {
-        pinned = JSON.parse(localStorage.getItem('pinned'));
-    }
-    pinned[currentRoom.name()].push(postId);
-    localStorage.setItem('pinned', JSON.stringify(pinned));
+function getFirstPost(callback) {
+    var posts = currentRoomValueCache['posts'];
+    for (var postId in posts) if (posts.hasOwnProperty(postId)) break;
+    var post = posts[postId];
+    post['id'] = postId;
+    if (typeof callback === 'function') callback(post);
 }
 
 
-// returns data via callback as [ postId, {post obj} ]
-function getPost(roomId, postId, callback) {
-    if (currentRoom.name() === roomId) {
-        var post = [ postId, currentRoomValueCache['posts'][postId] ];
-        if (typeof callback === 'function')
-            callback(post);
-    } else {
-        rooms.child(roomId)
-            .child('posts')
-            .child(postId).once('value', function(snapshot) {
-                var post = [ postId, snapshot.val() ];;
-                if (typeof callback === 'function') callback(post);
-            });
-    }
-}
+//// returns data via callback as [ postId, {post obj} ]
+//function getPost(roomId, postId, callback) {
+    //if (currentRoom.name() === roomId) {
+        ////var post = [ postId, currentRoomValueCache['posts'][postId] ];
+        //if (typeof callback === 'function') callback(postId, currentRoomValueCache['posts'][postId]);
+    //} else {
+        //rooms.child(roomId)
+            //.child('posts')
+            //.child(postId).once('value', function(snapshot) {
+                ////var post = [ postId, snapshot.val() ];
+                //if (typeof callback === 'function') callback(postId, snapshot.val());
+            //});
+    //}
+//}
 
-// returns data via callback as [ postId, {post obj} ]
-function getFirstPost(roomId, callback) {
-    if (currentRoom.name() === roomId) {
-        var posts = currentRoomValueCache['posts'];
-        for (var key in posts) if (posts.hasOwnProperty(key)) break;
-        var post = [ key, posts[key] ]; 
-        if (typeof callback === 'function') callback(post);
-    } else {
-        rooms.child(roomId)
-             .child('posts')
-             .startAt()
-             .limit(1).once('value', function(snapshot) {
-                 var post = [];
-                 for (key in snapshot.val()) {
-                     if (snapshot.val().hasOwnProperty(key)) {
-                         post = [ key, snapshot.val()[key] ];
-                         break;
-                     }
-                 }
-                 if (typeof callback === 'function') callback(post);
-             });
-    }
-}
+//// returns data via callback as [ postId, {post obj} ]
+//function getFirstPost(roomId, callback) {
+    //if (currentRoom.name() === roomId) {
+        //var posts = currentRoomValueCache['posts'];
+        //for (var key in posts) if (posts.hasOwnProperty(key)) break;
+        //var post = [ key, posts[key] ]; 
+        //if (typeof callback === 'function') callback(post);
+    //} else {
+        //rooms.child(roomId)
+             //.child('posts')
+             //.startAt()
+             //.limit(1).once('value', function(snapshot) {
+                 //var post = [];
+                 //for (key in snapshot.val()) {
+                     //if (snapshot.val().hasOwnProperty(key)) {
+                         //post = [ key, snapshot.val()[key] ];
+                         //break;
+                     //}
+                 //}
+                 //if (typeof callback === 'function') callback(post);
+             //});
+    //}
+//}
 
 function getUserId() {
     return localStorage.getItem('user_id') || 'Anonymous';
